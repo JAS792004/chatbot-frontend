@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToDatabase } from "@/utils/db"; // ✅ Fixed import
-import User from "@/models/User";
+import User from "../../../models/user"; // Use lowercase if your file is named user.ts
 import bcrypt from "bcryptjs";
 
 const authOptions = {

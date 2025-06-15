@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import connectDB from "@/utils/db";
+import { connectToDatabase } from "@/utils/db"; // ✅ Fixed import
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
@@ -13,7 +13,7 @@ const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        await connectDB();
+        await connectToDatabase(); // ✅ Fixed usage
 
         const user = await User.findOne({ email: credentials?.email });
 

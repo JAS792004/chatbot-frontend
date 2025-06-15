@@ -1,7 +1,7 @@
 // pages/api/auth/register.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { connectToDatabase } from "@/utils/db"; // ✅ Absolute path (check your tsconfig if needed)
-import User from "@/models/User"; // Create this model next
+import User from "@/models/user"; // Create this model next
 import bcrypt from "bcryptjs";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

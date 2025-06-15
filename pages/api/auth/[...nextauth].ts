@@ -1,10 +1,10 @@
-import NextAuth from "next-auth";
+import NextAuth, { AuthOptions, SessionStrategy } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { connectToDatabase } from "@/utils/db"; // ✅ Fixed import
-import User from "../../../models/user"; // Use lowercase if your file is named user.ts
+import { connectToDatabase } from "@/utils/db";
+import User from "@/models/user"; // Make sure the filename is lowercase "user.ts"
 import bcrypt from "bcryptjs";
 
-const authOptions = {
+const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -13,29 +13,43 @@ const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        await connectToDatabase(); // ✅ Fixed usage
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email and password are required");
+        }
 
-        const user = await User.findOne({ email: credentials?.email });
+        await connectToDatabase();
 
-        if (!user) throw new Error("No user found");
+        const user = await User.findOne({ email: credentials.email });
 
-        const isValid = await bcrypt.compare(
-          credentials!.password,
+        if (!user) {
+          throw new Error("No user found with this email");
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
           user.password
         );
 
-        if (!isValid) throw new Error("Invalid password");
+        if (!isPasswordValid) {
+          throw new Error("Incorrect password");
+        }
 
-        return { id: user._id, email: user.email };
+        return {
+          id: user._id.toString(),
+          email: user.email,
+        };
       },
     }),
   ],
+
   secret: process.env.NEXTAUTH_SECRET,
+
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as SessionStrategy, // ✅ Correctly typed
   },
+
   pages: {
-    signIn: "/login",
+    signIn: "/login", // Customize this path as needed
   },
 };
 
